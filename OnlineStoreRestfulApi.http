@@ -1,0 +1,6 @@
+@OnlineStoreRestfulApi_HostAddress = http://localhost:5063
+
+GET {{OnlineStoreRestfulApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
