@@ -12,7 +12,7 @@ dotnet build
 # 4. Change the appsetting.jsons connectionstring to your database info
 
 # 5.  Then you are good to run go Run the project
-dotnet run
+Open out the project using visual studio and run 
 
 
 # Assumption made in this project is that if customer buy 1 airpods he definitely will get another one by free doesn't matter he wants or not 
