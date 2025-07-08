@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OnlineStoreRestfulApi.Datas;
-using OnlineStoreRestfulApi.Helpers; 
+using OnlineStoreRestfulApi.Helpers;
+using OnlineStoreRestfulApi.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ var jwtKey = builder.Configuration["JwtSettings:Key"]!;
 var key = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<StoreService>();
+builder.Services.AddScoped<AuthService>();
 
 // Get connect to db
 builder.Services.AddDbContext<AppDbContext>(options =>

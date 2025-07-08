@@ -1,41 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OnlineStoreRestfulApi.Helpers;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OnlineStoreRestfulApi.Models;
-using OnlineStoreRestfulApi.Datas;
-using Microsoft.AspNetCore.Authorization;
+using OnlineStoreRestfulApi.Services;
 
-namespace OnlineStoreRestfulApi.Controllers;
-[AllowAnonymous]
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+namespace OnlineStoreRestfulApi.Controllers
 {
-    private readonly AppDbContext _context;
-    private readonly JwtHelper _jwtHelper;
-
-    public AuthController(AppDbContext context, JwtHelper jwtHelper)
+    [AllowAnonymous]
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AuthController : ControllerBase
     {
-        _context = context;
-        _jwtHelper = jwtHelper;
-    }
+        private readonly AuthService _auth;
 
+        public AuthController(AuthService auth)
+        {
+            _auth = auth;
+        }
 
-    [HttpPost("Register")]
-    public IActionResult Register(User user)
-    {
-        _context.Users.Add(user);
-        _context.SaveChanges();
-        return Ok(new { IsSuccess = true });
-    }
+        [HttpPost("Register")]
+        public IActionResult Register(User user)
+        {
+            var success = _auth.RegisterUser(user);
+            return Ok(new { IsSuccess = success });
+        }
 
-    [HttpPost("Login")]
-    public IActionResult Login([FromBody] LoginRequest req)
-    {
-        var found = _context.Users.FirstOrDefault(x => x.Username == req.Username && x.Password == req.Password);
-        if (found == null) return Unauthorized();
+        [HttpPost("Login")]
+        public IActionResult Login([FromBody] LoginRequest req)
+        {
+            var token = _auth.Login(req.Username, req.Password);
+            if (token == null)
+                return Unauthorized();
 
-        var token = _jwtHelper.GenerateJwtToken(found.UserId);
-
-        return Ok(new { JWT = token });
+            return Ok(new { JWT = token });
+        }
     }
 }
