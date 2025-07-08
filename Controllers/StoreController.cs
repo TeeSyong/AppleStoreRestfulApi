@@ -24,20 +24,16 @@ namespace OnlineStoreRestfulApi.Controllers
         }
 
         [Authorize]
-        [HttpGet("test-auth")]
-        public IActionResult Test()
-        {
-            var userId = User.FindFirstValue("userId");
-            return Ok(new { message = "Authenticated!", userId });
-        }
-
-        [Authorize]
         [HttpPost("AddToCart")]
         public async Task<ActionResult<bool>> AddToCart([FromBody] List<AddToCartRequest> items)
         {
             int userId = int.Parse(User.FindFirstValue("userId")!);
             await _store.AddToCartAsync(userId, items);
-            return true;
+            return Ok(new
+            {
+                isSuccess = true,
+                message = "Items successfully added to cart!"
+            });
         }
 
         [Authorize]
@@ -54,8 +50,20 @@ namespace OnlineStoreRestfulApi.Controllers
         {
             int userId = int.Parse(User.FindFirstValue("userId")!);
             var success = await _store.ProcessOrderAsync(userId);
-            if (!success) return BadRequest("Cart is empty.");
-            return true;
+            if (!success)
+            {
+                return BadRequest(new
+                {
+                    isSuccess = false,
+                    message = "Your cart is empty, nothing to checkout."
+                });
+            }
+
+            return Ok(new
+            {
+                isSuccess = true,
+                message = "Order successfully processed!"
+            });
         }
 
         [Authorize]
